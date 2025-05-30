@@ -9,19 +9,21 @@ class StatistiqueController extends Controller
 {
     public function index()
     {
-        $etudiants = Etudiant::with('notes')->get();
+        // Charger tous les étudiants avec leurs notes
+        $etudiants = Etudiant::with('notes')->get(); 
 
-        $resultats = $etudiants->map(function($e) {
-            $moyenne = $e->notes->avg('note');
-            return [
-                'etudiant' => $e,
-                'moyenne' => round($moyenne, 2)
-            ];
-        });
 
-        $meilleur = $resultats->sortByDesc('moyenne')->first();
-        $moyenneGenerale = round($resultats->pluck('moyenne')->avg(), 2);
+        // Calcul de la moyenne générale de la classe
+        $moyenneGenerale = $etudiants->flatMap(function ($etudiant) {
+            return $etudiant->notes;
+        })->avg('note');
 
-        return view('statistiques.index', compact('resultats', 'meilleur', 'moyenneGenerale'));
+        // Recherche de l'étudiant avec la meilleure moyenne
+        $meilleurEtudiant = $etudiants
+            ->filter(fn($e) => $e->notes->count() > 0) // filtrer ceux qui ont au moins une note
+            ->sortByDesc(fn($e) => $e->notes->avg('note'))
+            ->first();
+
+        return view('statistiques.index', compact('etudiants', 'moyenneGenerale', 'meilleurEtudiant'));
     }
 }

@@ -13,31 +13,33 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($etudiants as $etudiants)
-                    <tr>
-                        <td>{{ $etudiants->nom }} {{ $etudiants->prenom }}</td>
-                        <td>{{ $etudiants->note->count() }}</td>
-                        <td>
-                            @if ($etudiants->note->count() > 0)
-                                {{ round($etudiants->note->avg('note'), 2) }}
-                            @else
-                                N/A
-                            @endif
-                        </td>
-                    </tr>
+               @foreach ($etudiants as $etudiant)
+    <tr>
+                <td>{{ $etudiant->nom }} {{ $etudiant->prenom }}</td>
+                <td>{{ $etudiant->notes->count() }}</td>
+                <td>
+            @if ($etudiant->notes->count() > 0)
+                {{ round($etudiant->notes->avg('note'), 2) }}
+            @else
+                N/A
+            @endif
+                </td>
+    </tr>
                 @endforeach
+
             </tbody>
         </table>
 
         <hr>
 
-        <h5>Moyenne générale de la classe :
-            <strong>{{ round($moyenneGenerale, 2) }}/20</strong>
-        </h5>
+       @if ($meilleurEtudiant)
+    <h5>Meilleur étudiant :
+        <strong>{{ $meilleurEtudiant->nom }} {{ $meilleurEtudiant->prenom }}</strong>
+        avec <strong>{{ round($meilleurEtudiant->notes->avg('note'), 2) }}/20</strong>
+    </h5>
+@else
+    <h5>Aucun étudiant noté pour le moment.</h5>
+@endif
 
-        <h5>Meilleur étudiant :
-            <strong>{{ $meilleurEtudiant->nom }} {{ $meilleurEtudiant->prenom }}</strong>
-            avec <strong>{{ round($meilleurEtudiant->note->avg('note'), 2) }}/20</strong>
-        </h5>
     </div>
 @endsection
